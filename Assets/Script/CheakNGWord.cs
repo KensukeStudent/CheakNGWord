@@ -21,17 +21,23 @@ using System.Linq;
 ///打ち込まれた文字のタイプにNGWordを整形
 ///漢字､ローマ字は省く --> 漢字の時はそのまま判定
 
+/// <summary>
+/// NGワードチェッククラス
+/// </summary>
 public class CheakNGWord : MonoBehaviour
 {
     /// <summary>
     /// 文字列変換クラス
     /// </summary>
     ChagneCharacters charaClass = new ChagneCharacters();
+    NGWordInfo ngWordInfo;
 
     private void Start()
     {
+        ngWordInfo = new NGWordInfo();
+
         //入力テキスト
-        var inputCharacter = "もるこ";
+        var inputCharacter = "ころす";
 
         var ret = NGWrodCheaker(inputCharacter) ?
         "この言葉はNGワードです："           + inputCharacter:
@@ -61,13 +67,23 @@ public class CheakNGWord : MonoBehaviour
             if (ret) return true;
         }
 
+        //同じ文字列の長さの文字を取得
+        List<string> characters;
+
         switch (charaType)
         {
             //ひらがな、半角カタカナ、全角カタカナ
             case ChagneCharacters.CharaType.Japasece:
             case ChagneCharacters.CharaType.ZenKatakana:
-            case ChagneCharacters.CharaType.HanKatakana:    
-                //全探索で文字の長さを比較 --> 文字番号を比較 --> マッチしていれば検査開始
+            case ChagneCharacters.CharaType.HanKatakana:
+
+                //検索方法//
+                //全探索で同じ文字の長さを取得 --> 文字番号を比較 --> マッチしていれば検査開始
+
+                characters = GetSameLength(inputCharacter);
+
+                //無ければfalseを返します
+                if (characters.Count == 0) return false;
 
 
 
@@ -75,7 +91,9 @@ public class CheakNGWord : MonoBehaviour
 
             //ローマ字
             case ChagneCharacters.CharaType.English:
-                //最初の一文字目を比較 --> マッチしていれば検査開始
+
+                //検索方法//
+                //入力文字列の最初の一文字目とNGワード文字列の一文字目を比較 --> マッチしていれば検査開始
 
                 break;
         }
@@ -88,9 +106,7 @@ public class CheakNGWord : MonoBehaviour
     /// </summary>
     /// <param name="inputCharacter">入力された文字列</param>
     bool SameCharacterCheaker(string inputCharacter,int charaType)
-    {
-        var ngWordInfo = new NGWordInfo();
-        
+    {        
         for (int NGtype = 0; NGtype < ngWordInfo.typeCount; NGtype++)
         {
             //NG表現配列
@@ -103,5 +119,40 @@ public class CheakNGWord : MonoBehaviour
         }
 
         return false; 
+    }
+
+    /// <summary>
+    /// 入力された文字列の長さと同じ文字列をJsonから取得
+    /// </summary>
+    List<string> GetSameLength(string inputCharacter)
+    {
+        var length = inputCharacter.Length;
+        var characters = new List<string>();
+
+        for (int NGtype = 0; NGtype < ngWordInfo.typeCount; NGtype++)
+        {
+            //NG表現配列
+            var ngWordType = ngWordInfo.GetNGWord(NGtype);
+
+            for (int wordType = 0; wordType < ngWordType.characters.Length; wordType++)
+            {
+                //入力されたタイプと同じ文字タイプ
+                var ngWord = ngWordType.GetWord(wordType);
+
+                for (int no = 0; no < ngWord.Length; no++)
+                {
+                    //文字列の長さを比較
+                    //入力文字列の最初の一文字目とNGワード文字列の一文字目を比較
+                    if (length == ngWord[no].Length)
+                    {
+                        //最初の文字が同じであればリストに追加
+                        if(charaClass.GetCharacterNo(inputCharacter, ngWord[no]))
+                        characters.Add(ngWord[no]);
+                    }
+                }
+            }
+        }
+
+        return characters;
     }
 }

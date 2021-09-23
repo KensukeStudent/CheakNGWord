@@ -1,15 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System;
-
-//濁点
+using System.Linq;
 
 /// <summary>
 /// 文字変換クラス
 /// </summary>
 public class ChagneCharacters
 {
-    readonly string[] japanese =
+    readonly string[] japanese = 
     {
         "あ","い","う","え","お",
         "か","き","く","け","こ",
@@ -28,7 +28,7 @@ public class ChagneCharacters
         "わ","を","ん"
     };
 
-    readonly string[] zenkana =
+    readonly string[] zenkana = 
     {
         "ア","イ","ウ","エ","オ",
         "カ","キ","ク","ケ","コ",
@@ -47,7 +47,7 @@ public class ChagneCharacters
         "ワ","ヲ","ン",
     };
 
-    readonly string[] hankana =
+    readonly string[] hankana = 
     {
         "ｱ", "ｲ", "ｳ", "ｴ", "ｵ",
         "ｶ", "ｷ", "ｸ", "ｹ", "ｺ",
@@ -66,7 +66,7 @@ public class ChagneCharacters
         "ﾜ", "ｦ", "ﾝ",
     };
 
-    readonly string[] english =
+    readonly string[] english = 
     {
         "a",  "i", "u", "e", "o",
         "ka","ki","ku","ke","ko",
@@ -132,7 +132,6 @@ public class ChagneCharacters
     string ToChangeCharacter(string character, string NGWord)
     {
         var sb = new StringBuilder("");
-        string[][] arrayType = { japanese, zenkana, hankana, english };
 
         //NGワードの文字タイプ配列から格納番号を取得
         var arrayNo = IndexOf(NGWord);
@@ -140,13 +139,12 @@ public class ChagneCharacters
         var charaType = AnalysisType(character);
         if (arrayNo == null || charaType == CharaType.Else) return NGWord;
 
-        //文字配列
-        var array = arrayType[(int)charaType];
+        var arrayType = GetCharacterArray((int)charaType);
 
         //NGWord文字 -----> 入力された文字タイプに変換
         for (int i = 0; i < NGWord.Length; i++)
         {
-            sb.Append(array[arrayNo[i]]);
+            sb.Append(arrayType[arrayNo[i]]);
         }
 
         return sb.ToString();
@@ -161,9 +159,9 @@ public class ChagneCharacters
         //NGワードから文字タイプ識別
         var charaType = AnalysisType(NGWord);
 
-        string[][] arrayType = { japanese, zenkana };
-
         if (charaType != CharaType.Japasece && charaType != CharaType.ZenKatakana) return null;
+
+        var arrayType = GetCharacterArray((int)charaType);
 
         //文字の長さを取得
         var characterLength = NGWord.Length;
@@ -172,14 +170,9 @@ public class ChagneCharacters
 
         for (int c = 0; c < characterLength; c++)
         {
-            for (int i = 0; i < arrayType[(int)charaType].Length; i++)
-            {
-                if (NGWord[c].ToString() == arrayType[(int)charaType][i])
-                {
-                    arrayNo[c] = i;
-                    break;
-                }
-            }
+            var index = arrayType.IndexOf(NGWord[c].ToString());
+
+            if (index != -1) arrayNo[c] = index;
         }
 
         return arrayNo;
@@ -242,5 +235,39 @@ public class ChagneCharacters
         //A～Zまで(小文字、大文字区別なし)
         var regex = new Regex(@"^[\u0041-\u005A]+$");
         return Regex.IsMatch(character, regex.ToString(), RegexOptions.IgnoreCase);
+    }
+
+    /// <summary>
+    /// 入力された文字列とNGワードの文字列の最初の一文字目が同じか判定
+    /// </summary>
+    public bool GetCharacterNo(string character, string NGWord)
+    {
+        string[] judgeCharacters = { character, NGWord };
+        int[] judgeNo = { -1, -1 };
+        
+        //character --> 半角カタカナの場合、濁点も入れる
+
+        for (int i = 0; i < judgeCharacters.Length; i++)
+        {
+            var type = AnalysisType(judgeCharacters[i]);
+            var arrayType = GetCharacterArray((int)type);
+
+            for (int no = 0; no < arrayType.Count; no++)
+            {
+                if (character[i].ToString() == arrayType[no])
+                    judgeNo[i] = no;
+            }
+        }
+
+        return judgeNo[0] == judgeNo[1];
+    }
+
+    /// <summary>
+    /// 文字タイプ配列
+    /// </summary>
+    List<string> GetCharacterArray(int charaType)
+    {
+        string[][] characterType = { japanese, zenkana, hankana, english };
+        return characterType[charaType].ToList();
     }
 }
