@@ -1,14 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
-//判定の仕方
-//禁止ワードと打ち込まれた文字を比較
-//打ち込まれた文字(ひらがな、カタカナ、半角カタカナ、ローマ字)
+///判定前審査
+///入力された文字が漢字か日本語化
+/// ↓
+/// 英語なら日本語の方に回す
+/// ↓
+/// 日本語なら文字列の長さを比較
+/// 英語なら最初の一文字と日本語の一文字目を比較
+/// ↓
+/// 異なれば判定開始
 
-//打ち込まれた文字のタイプを検索
 
-//漢字､ローマ字は省く --> 漢字の時はそのまま判定
+/// 判定の仕方
+///禁止ワードと打ち込まれた文字を比較
+///打ち込まれた文字(ひらがな、カタカナ、半角カタカナ、ローマ字)
+///打ち込まれた文字のタイプにNGWordを整形
+///漢字､ローマ字は省く --> 漢字の時はそのまま判定
 
 public class CheakNGWord : MonoBehaviour
 {
@@ -20,11 +30,10 @@ public class CheakNGWord : MonoBehaviour
     private void Start()
     {
         //NGワード
-        var NGWord = "ごりら";
+        var NGWord = "ぎろ";
         //入力テキスト
-        var inputCharacter = "ゴリラ";
+        var inputCharacter = "Giro";
 
-
-        Debug.Log(charaClass.ToChangeCharacter(inputCharacter, NGWord));
+        Debug.Log(charaClass.NGJudgement(inputCharacter,NGWord));
     }
 }
