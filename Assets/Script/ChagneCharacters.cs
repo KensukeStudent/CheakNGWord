@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using System;
 
 //濁点
 
@@ -84,6 +85,15 @@ public class ChagneCharacters
         "wa","wo", "n",
     };
 
+    public enum CharaType
+    {
+        Japasece,
+        ZenKatakana,
+        HanKatakana,
+        English,
+        Else
+    }
+
     delegate bool CharacterCheak(string character);
     CharacterCheak[] characterCheak;
 
@@ -128,10 +138,10 @@ public class ChagneCharacters
         var arrayNo = IndexOf(NGWord);
         //入力された文字タイプを識別
         var charaType = AnalysisType(character);
-        if (arrayNo == null || charaType == -1) return NGWord;
+        if (arrayNo == null || charaType == CharaType.Else) return NGWord;
 
         //文字配列
-        var array = arrayType[charaType];
+        var array = arrayType[(int)charaType];
 
         //NGWord文字 -----> 入力された文字タイプに変換
         for (int i = 0; i < NGWord.Length; i++)
@@ -153,7 +163,7 @@ public class ChagneCharacters
 
         string[][] arrayType = { japanese, zenkana };
 
-        if (charaType != 0 && charaType != 1) return null;
+        if (charaType != CharaType.Japasece && charaType != CharaType.ZenKatakana) return null;
 
         //文字の長さを取得
         var characterLength = NGWord.Length;
@@ -162,9 +172,9 @@ public class ChagneCharacters
 
         for (int c = 0; c < characterLength; c++)
         {
-            for (int i = 0; i < arrayType[charaType].Length; i++)
+            for (int i = 0; i < arrayType[(int)charaType].Length; i++)
             {
-                if (NGWord[c].ToString() == arrayType[charaType][i])
+                if (NGWord[c].ToString() == arrayType[(int)charaType][i])
                 {
                     arrayNo[c] = i;
                     break;
@@ -179,18 +189,19 @@ public class ChagneCharacters
     /// 文字列からひらがな、全角カタカナ、半角カタカナ、ローマ字を判定して番号を返します
     /// それ以外は-1を返します
     /// </summary>
-    public int AnalysisType(string character)
+    public CharaType AnalysisType(string character)
     {
         var cheakCount = characterCheak.Length;
+        CharaType charaType;
         for (int i = 0; i < cheakCount; i++)
         {
             if (characterCheak[i](character))
             {
-                return i;
+                return charaType = (CharaType)Enum.ToObject(typeof(CharaType),i);
             }
         }
 
-        return -1;
+        return charaType = CharaType.Else;
     }
 
     /// <summary>

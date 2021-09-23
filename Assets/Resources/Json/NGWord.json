@@ -1,0 +1,60 @@
+{
+  "discriminatory": [
+    {
+      "japanese": [
+        "ちんば",
+        "きちがい"
+      ],
+      "zenKatakana": [
+        "ポリコレ",
+        "ホモ",
+        "レズ",
+        "オカマ",
+        "バイ"
+      ],
+      "hanKatakana": [
+
+      ],
+      "english": [
+      ],
+      "kanji": [
+        "痴呆症",
+        "障碍者",
+        "障害者",
+        "伝染病",
+        "精神分裂症",
+        "ユダ公"
+      ]
+    }
+  ],
+  "sexual": [
+    {
+      "japanese": [
+        "せいき"
+      ],
+      "zenKatakana": [
+      ],
+      "hanKatakana": [
+      ],
+      "english": [
+      ],
+      "kanji": [
+        "性器"
+      ]
+    }
+  ],
+  "danger": [
+    {
+      "japanese": [
+      ],
+      "zenKatakana": [
+      ],
+      "english": [
+      ],
+      "hanKatakana": [
+      ],
+      "kanji": [
+      ]
+    }
+  ]
+}
