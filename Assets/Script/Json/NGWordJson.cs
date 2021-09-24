@@ -20,7 +20,7 @@ public class NGWordJson
     public string[] hanKatakana;
     //
     public string[] english;
-    public string[] kanji;
+    public string[] other;
 
     public void SetCharacaterArray()
     {
@@ -30,7 +30,7 @@ public class NGWordJson
             zenKatakana,
             hanKatakana,
             english,
-            kanji
+            other
         };
 
         this.characters = characters;

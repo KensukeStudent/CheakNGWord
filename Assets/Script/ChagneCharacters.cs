@@ -9,6 +9,8 @@ using System.Linq;
 /// </summary>
 public class ChagneCharacters
 {
+    readonly int arrayCount;
+
     readonly string[] japanese = 
     {
         "あ","い","う","え","お",
@@ -99,6 +101,8 @@ public class ChagneCharacters
 
     public ChagneCharacters()
     {
+        arrayCount = japanese.Length;
+
         characterCheak = new CharacterCheak[4]
         {
             IsHiragana,
@@ -111,32 +115,29 @@ public class ChagneCharacters
     /// <summary>
     /// NGワードと入力された文字列を判定します
     /// </summary>
-    /// <param name="character">入力文字</param>
+    /// <param name="inputCharacter">入力文字</param>
     /// <param name="NGWord">NGワード</param>
-    public bool NGJudgement(string character, string NGWord)
+    public bool NGJudgement(string inputCharacter, string NGWord)
     {
-        //文字が同じかどうかを判定
-        if (Regex.IsMatch(character, NGWord, RegexOptions.IgnoreCase)) return true;
-
         //文字列が同じ出なければNGワードを入力された文字タイプに変換
-        var judgeCharacter = ToChangeCharacter(character, NGWord);
+        var judgeCharacter = ToChangeCharacter(inputCharacter, NGWord);
 
-        return Regex.IsMatch(character, judgeCharacter, RegexOptions.IgnoreCase);
+        return Regex.IsMatch(inputCharacter, judgeCharacter, RegexOptions.IgnoreCase);
     }
 
     /// <summary>
     /// 指定した文字タイプへ変換した文字列を返します
     /// </summary>
-    /// <param name="character">入力文字列</param>
+    /// <param name="inputCharacter">入力文字列</param>
     /// <param name="NGWord">変換する文字タイプ</param>
-    string ToChangeCharacter(string character, string NGWord)
+    string ToChangeCharacter(string inputCharacter, string NGWord)
     {
         var sb = new StringBuilder("");
 
         //NGワードの文字タイプ配列から格納番号を取得
         var arrayNo = IndexOf(NGWord);
         //入力された文字タイプを識別
-        var charaType = AnalysisType(character);
+        var charaType = AnalysisType(inputCharacter);
         if (arrayNo == null || charaType == CharaType.Else) return NGWord;
 
         var arrayType = GetCharacterArray((int)charaType);
@@ -240,30 +241,72 @@ public class ChagneCharacters
     /// <summary>
     /// 入力された文字列とNGワードの文字列の最初の一文字目が同じか判定
     /// </summary>
-    public bool GetCharacterNo(string character, string NGWord)
+    public bool CheakCharacterNo(string inputCharacter, string NGWord)
     {
-        string[] judgeCharacters = { character, NGWord };
+        string[] judgeCharacters = { inputCharacter, NGWord };
         int[] judgeNo = { -1, -1 };
-        
-        //character --> 半角カタカナの場合、濁点も入れる
 
         for (int i = 0; i < judgeCharacters.Length; i++)
         {
-            var type = AnalysisType(judgeCharacters[i]);
-            var arrayType = GetCharacterArray((int)type);
+            var charaType = AnalysisType(judgeCharacters[i]);
+            //タイプがElseなら処理しません
+            if (charaType == CharaType.Else) return false;
 
-            for (int no = 0; no < arrayType.Count; no++)
-            {
-                if (character[i].ToString() == arrayType[no])
-                    judgeNo[i] = no;
-            }
+            //一文字目を取得 ---->
+            //半角カタカナ場合少し変更
+            var character = charaType == CharaType.HanKatakana ?
+                GetHanKakuChar(judgeCharacters[i])
+                :
+                judgeCharacters[i][0].ToString();
+
+            var arrayType = GetCharacterArray((int)charaType);
+
+            //一文字目の配列番号を取得
+            judgeNo[i] = arrayType.IndexOf(character);
         }
 
         return judgeNo[0] == judgeNo[1];
     }
 
     /// <summary>
-    /// 文字タイプ配列
+    /// 入力された一文字目とNGワードの一文字目が同じか判定
+    /// </summary>
+    public bool CheakSameChar(string inputCharacter, string NGWord)
+    {
+        //NGワードから文字タイプ識別
+        var charaType = AnalysisType(NGWord);
+        if (charaType == CharaType.Else) return false;
+        var arrayType = GetCharacterArray((int)charaType);
+
+        //一文字目を取得 ---->
+        //半角カタカナ場合少し変更
+        var NGChar = charaType == CharaType.HanKatakana ?
+                GetHanKakuChar(NGWord)
+                :
+                NGWord[0].ToString();
+
+        var index = arrayType.IndexOf(NGChar);
+
+        if (index < 0 || index > arrayCount) return false;
+
+        return Regex.IsMatch(inputCharacter[0].ToString(), english[index][0].ToString(), RegexOptions.IgnoreCase);
+    }
+
+    /// <summary>
+    /// 半角カタカナ文字を取得
+    /// </summary>
+    string GetHanKakuChar(string hChar)
+    {
+        var ret = Regex.IsMatch(hChar, @"^.(ﾞ|ﾟ)");
+
+        return _ = ret ?
+            hChar.Substring(0, 2)
+            :
+            hChar[0].ToString();
+    }
+
+    /// <summary>
+    /// 文字タイプ配列を取得
     /// </summary>
     List<string> GetCharacterArray(int charaType)
     {

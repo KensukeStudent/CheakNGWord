@@ -37,10 +37,10 @@ public class CheakNGWord : MonoBehaviour
         ngWordInfo = new NGWordInfo();
 
         //入力テキスト
-        var inputCharacter = "ころす";
+        var inputCharacter = "Point";
 
         var ret = NGWrodCheaker(inputCharacter) ?
-        "この言葉はNGワードです："           + inputCharacter:
+        "この言葉はNGワードです：" + inputCharacter :
         "この言葉はNGワードではありません：" + inputCharacter;
 
         Debug.Log(ret);
@@ -68,7 +68,7 @@ public class CheakNGWord : MonoBehaviour
         }
 
         //同じ文字列の長さの文字を取得
-        List<string> characters;
+        List<string> NGWords = new List<string>();
 
         switch (charaType)
         {
@@ -78,14 +78,10 @@ public class CheakNGWord : MonoBehaviour
             case ChagneCharacters.CharaType.HanKatakana:
 
                 //検索方法//
-                //全探索で同じ文字の長さを取得 --> 文字番号を比較 --> マッチしていれば検査開始
+                //--> 全探索で同じ文字の長さを取得・文字番号を比較
+                //--> マッチしていれば検査開始
 
-                characters = GetSameLength(inputCharacter);
-
-                //無ければfalseを返します
-                if (characters.Count == 0) return false;
-
-
+                GetSameLength(inputCharacter, ref NGWords);
 
                 break;
 
@@ -94,8 +90,19 @@ public class CheakNGWord : MonoBehaviour
 
                 //検索方法//
                 //入力文字列の最初の一文字目とNGワード文字列の一文字目を比較 --> マッチしていれば検査開始
-
+                GetSameChar(inputCharacter, ref NGWords);
                 break;
+        }
+
+        //無ければfalseを返します
+        if (NGWords.Count == 0) return false;
+        
+        //NGワード検索開始
+        foreach (var NGWord in NGWords)
+        {
+            ret = charaClass.NGJudgement(inputCharacter, NGWord);
+
+            if (ret) return true;
         }
 
         return false;
@@ -113,9 +120,13 @@ public class CheakNGWord : MonoBehaviour
             var ngWordType = ngWordInfo.GetNGWord(NGtype);
 
             //入力されたタイプと同じ文字タイプ
-            var ngWord = ngWordType.GetWord(charaType);
+            var NGWords = ngWordType.GetWord(charaType);
 
-            if (ngWord.Contains(inputCharacter)) return true;
+            foreach (var NGWord in NGWords)
+            {
+                //文字が同じかどうかを判定
+                if (Regex.IsMatch(inputCharacter, NGWord, RegexOptions.IgnoreCase)) return true;
+            }
         }
 
         return false; 
@@ -124,35 +135,53 @@ public class CheakNGWord : MonoBehaviour
     /// <summary>
     /// 入力された文字列の長さと同じ文字列をJsonから取得
     /// </summary>
-    List<string> GetSameLength(string inputCharacter)
+    void GetSameLength(string inputCharacter, ref List<string> characters)
     {
         var length = inputCharacter.Length;
-        var characters = new List<string>();
-
         for (int NGtype = 0; NGtype < ngWordInfo.typeCount; NGtype++)
         {
-            //NG表現配列
+            //NG表現Json配列
             var ngWordType = ngWordInfo.GetNGWord(NGtype);
 
-            for (int wordType = 0; wordType < ngWordType.characters.Length; wordType++)
+            for (int wordType = 0; wordType < ngWordType.characters.Length - 2; wordType++)
             {
-                //入力されたタイプと同じ文字タイプ
-                var ngWord = ngWordType.GetWord(wordType);
+                //入力されたタイプを出力
+                var NGWords = ngWordType.GetWord(wordType);
 
-                for (int no = 0; no < ngWord.Length; no++)
+                foreach (var NGWord in NGWords)
                 {
                     //文字列の長さを比較
-                    //入力文字列の最初の一文字目とNGワード文字列の一文字目を比較
-                    if (length == ngWord[no].Length)
+                    if (length == NGWord.Length &&
+                        //入力文字列の最初の一文字目とNGワード文字列の一文字目を比較
+                        charaClass.CheakCharacterNo(inputCharacter, NGWord))
                     {
-                        //最初の文字が同じであればリストに追加
-                        if(charaClass.GetCharacterNo(inputCharacter, ngWord[no]))
-                        characters.Add(ngWord[no]);
+                        characters.Add(NGWord);
                     }
                 }
             }
         }
+    }
 
-        return characters;
+    /// <summary>
+    /// 入力された一文字目と
+    /// </summary>
+    void GetSameChar(string inputCharacter, ref List<string> characters)
+    {
+        for (int NGtype = 0; NGtype < ngWordInfo.typeCount; NGtype++)
+        {
+            //NG表現Json配列
+            var ngWordType = ngWordInfo.GetNGWord(NGtype);
+
+            for (int wordType = 0; wordType < ngWordType.characters.Length - 1; wordType++)
+            {
+                //入力されたタイプを出力
+                var NGWords = ngWordType.GetWord(wordType);
+
+                foreach (var NGWord in NGWords)
+                {
+                    if (charaClass.CheakSameChar(inputCharacter, NGWord)) characters.Add(NGWord);
+                }
+            }
+        }
     }
 }
