@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace NGCheaker
@@ -27,9 +25,9 @@ namespace NGCheaker
 
             NGWordJson[] ngWordJsons =
             {
-            discriminatoryList.discriminatory[0],
-            sexualList.sexual[0],
-            dangerList.danger[0]
+              discriminatoryList.discriminatory[0],
+              sexualList.sexual[0],
+              dangerList.danger[0]
             };
 
             this.ngWordJsons = ngWordJsons;
@@ -47,9 +45,10 @@ namespace NGCheaker
         {
             try
             {
-                using (StreamReader sr = new StreamReader(Application.dataPath + "/Resources/Json/NGWord.json"))
+                var json = Resources.Load<TextAsset>("Json/NGWord").text;
+
+                if(!string.IsNullOrEmpty(json))
                 {
-                    string json = sr.ReadToEnd();
                     discriminatoryList = JsonUtility.FromJson<NGDiscriminatory>(json);
                     sexualList = JsonUtility.FromJson<NGSexual>(json);
                     dangerList = JsonUtility.FromJson<NGDanger>(json);

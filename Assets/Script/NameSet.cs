@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using NGCheaker;
 using UnityEngine;
 using UnityEngine.UI;
-using NGCheaker;
 
 public class NameSet : MonoBehaviour
 {
@@ -14,6 +12,14 @@ public class NameSet : MonoBehaviour
     private void Start()
     {
         inputField.onEndEdit.AddListener(call => SendName());
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            Application.Quit();
+        }
     }
 
     /// <summary>
