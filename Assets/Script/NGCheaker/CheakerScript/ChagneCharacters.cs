@@ -1,3 +1,4 @@
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +104,7 @@ namespace NGCheaker
 
         public ChagneCharacters()
         {
+            //配列内の合計文字数を取得
             arrayCount = japanese.Length;
 
             characterCheak = new CharacterCheak[4]
@@ -128,7 +130,7 @@ namespace NGCheaker
         }
 
         /// <summary>
-        /// 指定した文字タイプへ変換した文字列を返します
+        /// 指定した文字タイプへ変換した後、文字列を返します
         /// </summary>
         /// <param name="inputCharacter">入力文字列</param>
         /// <param name="NGWord">変換する文字タイプ</param>
@@ -139,10 +141,10 @@ namespace NGCheaker
             //NGワードの文字タイプ配列から格納番号を取得
             var arrayNo = IndexOf(NGWord);
             //入力された文字タイプを識別
-            var charaType = AnalysisType(inputCharacter);
-            if (arrayNo == null || charaType == CharaType.Else) return NGWord;
+            var inputType = AnalysisType(inputCharacter);
+            if (arrayNo == null || inputType == CharaType.Else) return NGWord;
 
-            var arrayType = GetCharacterArray((int)charaType);
+            var arrayType = GetCharacterArray(inputType);
 
             //NGWord文字 -----> 入力された文字タイプに変換
             for (int i = 0; i < NGWord.Length; i++)
@@ -164,7 +166,7 @@ namespace NGCheaker
 
             if (charaType != CharaType.Japasece && charaType != CharaType.ZenKatakana) return null;
 
-            var arrayType = GetCharacterArray((int)charaType);
+            var arrayType = GetCharacterArray(charaType);
 
             //文字の長さを取得
             var characterLength = NGWord.Length;
@@ -176,28 +178,27 @@ namespace NGCheaker
                 var index = arrayType.IndexOf(NGWord[c].ToString());
 
                 if (index != -1) arrayNo[c] = index;
+                else return null;
             }
 
             return arrayNo;
         }
 
         /// <summary>
-        /// 文字列からひらがな、全角カタカナ、半角カタカナ、ローマ字を判定して番号を返します
+        /// 文字列からひらがな、全角カタカナ、半角カタカナ、ローマ字のどれかを判定して番号を返します
         /// それ以外は-1を返します
         /// </summary>
         public CharaType AnalysisType(string character)
         {
-            var cheakCount = characterCheak.Length;
-            CharaType charaType;
-            for (int i = 0; i < cheakCount; i++)
+            for (int i = 0; i < characterCheak.Length; i++)
             {
                 if (characterCheak[i](character))
                 {
-                    return charaType = (CharaType)Enum.ToObject(typeof(CharaType), i);
+                    return (CharaType)Enum.ToObject(typeof(CharaType), i);
                 }
             }
 
-            return charaType = CharaType.Else;
+            return CharaType.Else;
         }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace NGCheaker
                     :
                     judgeCharacters[i][0].ToString();
 
-                var arrayType = GetCharacterArray((int)charaType);
+                var arrayType = GetCharacterArray(charaType);
 
                 //一文字目の配列番号を取得
                 judgeNo[i] = arrayType.IndexOf(character);
@@ -278,7 +279,7 @@ namespace NGCheaker
             //NGワードから文字タイプ識別
             var charaType = AnalysisType(NGWord);
             if (charaType == CharaType.Else) return false;
-            var arrayType = GetCharacterArray((int)charaType);
+            var arrayType = GetCharacterArray(charaType);
 
             //一文字目を取得 ---->
             //半角カタカナ場合少し変更
@@ -301,7 +302,7 @@ namespace NGCheaker
         {
             var ret = Regex.IsMatch(hChar, @"^.(ﾞ|ﾟ)");
 
-            return _ = ret ?
+            return ret ?
                 hChar.Substring(0, 2)
                 :
                 hChar[0].ToString();
@@ -310,10 +311,10 @@ namespace NGCheaker
         /// <summary>
         /// 文字タイプ配列を取得
         /// </summary>
-        List<string> GetCharacterArray(int charaType)
+        List<string> GetCharacterArray(CharaType charaType)
         {
             string[][] characterType = { japanese, zenkana, hankana, english };
-            return characterType[charaType].ToList();
+            return characterType[(int)charaType].ToList();
         }
     }
 }

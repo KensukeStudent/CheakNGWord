@@ -23,7 +23,7 @@ public class NameSet : MonoBehaviour
     }
 
     /// <summary>
-    /// –¼‘O‚ğ‘—M
+    /// åå‰ã‚’é€ä¿¡
     /// </summary>
     void SendName()
     {
@@ -32,14 +32,14 @@ public class NameSet : MonoBehaviour
             var inputCharacter = inputField.text;
 
             var ret = cheakNG.NGWrodCheaker(inputCharacter) ?
-            "‚±‚ÌŒ¾—t‚ÍNGƒ[ƒh‚Å‚·F<color=red>" + inputCharacter + "</color>" :
-            "‚±‚ÌŒ¾—t‚ÍNGƒ[ƒh‚Å‚Í‚ ‚è‚Ü‚¹‚ñF" + inputCharacter;
+            "ã“ã®è¨€è‘‰ã¯NGãƒ¯ãƒ¼ãƒ‰ã§ã™ï¼š<color=red>" + inputCharacter + "</color>" :
+            "ã“ã®è¨€è‘‰ã¯NGãƒ¯ãƒ¼ãƒ‰ã§ã¯ã‚ã‚Šã¾ã›ã‚“ï¼š" + inputCharacter;
 
             text.text = ret;
         }
         else
         {
-            text.text = "“ü—Í‚µ‚Ä‰º‚³‚¢II";
+            text.text = "å…¥åŠ›ã—ã¦ä¸‹ã•ã„ï¼ï¼";
         }
     }
 }
