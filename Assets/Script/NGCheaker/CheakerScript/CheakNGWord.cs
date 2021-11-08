@@ -43,7 +43,7 @@ namespace NGCheaker
         /// <summary>
         /// 文字列変換クラス
         /// </summary>
-        ChagneCharacters charaClass = new ChagneCharacters();
+        readonly ChagneCharacters charaClass = new ChagneCharacters();
         /// <summary>
         /// NGワード情報
         /// </summary>
@@ -57,7 +57,6 @@ namespace NGCheaker
         {
             if (ngWordInfo == null) ngWordInfo = new NGWordInfo();
 
-            var ret = false;
             //文字タイプを取得
             var charaType = charaClass.AnalysisType(inputCharacter);
 
@@ -67,9 +66,7 @@ namespace NGCheaker
                 charaType == ChagneCharacters.CharaType.English ||
                 charaType == ChagneCharacters.CharaType.Else)
             {
-                ret = SameCharacterCheaker(inputCharacter, (int)charaType);
-
-                if (ret) return true;
+                if (SameCharacterCheaker(inputCharacter, (int)charaType)) return true;
             }
 
             //同じ文字列の長さの文字を取得
@@ -105,9 +102,7 @@ namespace NGCheaker
             //NGワード検索開始
             foreach (var NGWord in NGWords)
             {
-                ret = charaClass.NGJudgement(inputCharacter, NGWord);
-
-                if (ret) return true;
+                if (charaClass.NGJudgement(inputCharacter, NGWord)) return true;
             }
 
             return false;

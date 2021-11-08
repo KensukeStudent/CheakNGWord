@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace NGCheaker
 {
@@ -18,6 +20,8 @@ namespace NGCheaker
         NGDanger dangerList = new NGDanger();
 
         NGWordJson[] ngWordJsons = null;
+
+        readonly string jsonNGWord = Application.dataPath + "/Json/NGWord.json";
 
         public NGWordInfo()
         {
@@ -45,7 +49,8 @@ namespace NGCheaker
         {
             try
             {
-                var json = Resources.Load<TextAsset>("Json/NGWord").text;
+                var json = File.ReadAllText(FolderCheak(jsonNGWord));
+                //var json = Resources.Load<TextAsset>("Json/NGWord").text;
 
                 if(!string.IsNullOrEmpty(json))
                 {
@@ -67,6 +72,18 @@ namespace NGCheaker
         public NGWordJson GetNGWord(int ngWrodType)
         {
             return ngWordJsons[ngWrodType];
+        }
+
+        /// <summary>
+        /// セーブフォルダがあるかをチェック
+        /// </summary>
+        static string FolderCheak(string jsonPath)
+        {
+            //排除する文字
+            var replace = "/CheakNGWord_Data";
+
+            var r = Regex.Replace(jsonPath, replace, "");
+            return r;
         }
     }
 

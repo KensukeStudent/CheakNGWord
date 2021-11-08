@@ -1,4 +1,3 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -303,7 +302,7 @@ namespace NGCheaker
             var ret = Regex.IsMatch(hChar, @"^.(ﾞ|ﾟ)");
 
             return ret ?
-                hChar.Substring(0, 2)
+                hChar.Substring(0, 2)//半角カタカナなので2文字分
                 :
                 hChar[0].ToString();
         }

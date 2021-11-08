@@ -7,7 +7,7 @@ public class NameSet : MonoBehaviour
     [SerializeField] InputField inputField = null;
     [SerializeField] Text text = null;
 
-    CheakNGWord cheakNG = new CheakNGWord();
+    readonly CheakNGWord cheakNG = new CheakNGWord();
 
     private void Start()
     {
