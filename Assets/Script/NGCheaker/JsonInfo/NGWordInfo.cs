@@ -75,15 +75,19 @@ namespace NGCheaker
         }
 
         /// <summary>
-        /// セーブフォルダがあるかをチェック
+        /// フォルダがあるかをチェック
         /// </summary>
         static string FolderCheak(string jsonPath)
         {
             //排除する文字
-            var replace = "/CheakNGWord_Data";
+            var replace = "";
 
-            var r = Regex.Replace(jsonPath, replace, "");
-            return r;
+#if UNITY_EDITOR
+            replace = "/Assets";
+#else
+            replace = "/CheakNGWord_Data";
+#endif        
+            return Regex.Replace(jsonPath, replace, "");
         }
     }
 
